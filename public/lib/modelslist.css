@@ -1,0 +1,34 @@
+* {
+	margin: 0;
+	padding: 0;
+	
+}
+.span4{
+	width:200px;
+	height:250px;
+	background-color:#999;
+	float:left;
+	margin-left:20px;
+	margin-top:5px;
+	color: #06F;
+	
+	line-height: 20px;
+	font-weight: bold;
+	box-shadow: 1px 1px 5px #036;
+	}
+.span4 img{
+	width:200px;
+	height:200px;
+	
+	}
+	.nv{
+		width:100%;
+		height:40px;
+		background-color:#06F;
+		box-shadow: 1px 1px 5px #036;
+			color: #FFF;
+	text-align: center;
+	font-size:36px;
+	line-height: 30px;
+	font-weight: bold;
+		}

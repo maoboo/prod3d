@@ -1,0 +1,41 @@
+!!! 5
+html(lang="en")
+	head
+		title 三维商品展示
+		meta(charset="utf-8")
+		meta(name="viewport", content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0")
+		link(rel="stylesheet" href="/lib/main.css")
+		script(type="text/javascript" src="/lib/jquery-1.9.1.js")
+		script(src="/lib/three.min.js")
+		script(src="/lib/Detector.js")
+		script(src="/lib/OrbitControls.js")
+		script(src="/lib/jquery-ui.js")
+	body
+		button(id="123")显示/消失
+		.listArea(id="le")
+			.bt 背景
+			.bt 动画
+			.bt 说明
+			.sl 
+				.bg
+					ul.
+						<li><img src="bg/1.jpg"></img></li>
+						<li><img src="bg/2.jpg"></img></li>
+						<li><img src="bg/3.jpg"></img></li>
+						<li><img src="bg/3.jpg"></img></li>
+						<li><img src="bg/3.jpg"></img></li>
+						
+			.ani(id="ani1")
+			.sho(id="sho1")
+			div(style="clear:both")
+		script(src="/lib/main.js")
+		script
+			url = window.location.href;
+			paras = url.split('/');
+			mid = paras[paras.length-1];
+			//alert(mid);
+			//init("/models/"+mid+"/"+mid+".js");
+			init();
+			animate();
+			
+			

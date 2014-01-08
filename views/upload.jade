@@ -1,0 +1,28 @@
+
+extends layout
+
+
+block content
+  .av 云蓝三维商品展示
+     .upload 
+         form(method='post',id="upsubmit", action='/upload', enctype='multipart/form-data')
+             input(type="file",id="uploadimg",class="file1",name='file1')
+         |添加图片
+     .back(id="backbtn",onclick="back() ") 返回列表
+         form(method="get", id="backmod",action="models")
+
+  if imagefiles
+    each file in imagefiles
+      
+      .imgup(name=file)
+          a(href='/upload/bg/'+file)
+            img(src='/upload/bg/'+file)
+        
+          .delimg
+            input(type="hidden",name="file",class="delfile", value='/upload/bg/'+file,id="delfile")
+            .aa(id="delimg1",onclick="del('"+file+"')") 删除图片
+
+  
+  
+  
+  

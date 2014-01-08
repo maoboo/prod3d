@@ -1,0 +1,106 @@
+doctype 5
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/bootstrap/css/bootstrap.css')
+    link(rel='stylesheet', href='/bootstrap/css/bootstrap-theme.min.css')
+    link(rel='stylesheet', href='/bootstrap/css/bootstrap-responsive.css')
+    link(rel='stylesheet', href='/stylesheets/theme.css')
+    link(rel='stylesheet', href='/stylesheets/carousel.css')
+  body
+    div(class="navbar navbar-default navbar-fixed-top")
+      .container
+        .navbar-header
+          a(class="btn btn-navbar", data-toggle="collapse", data-target=".nav-collapse")
+            span(class="icon-bar")
+            span(class="icon-bar")
+            span(class="icon-bar")
+          a(class="navbar-brand", href="/") 禹步科技
+        div(class="navbar-collapse collapse")
+          ul(class="nav navbar-nav")
+            if !user
+                li(class="active")
+                  a(href="/")首页
+                li
+                  a(href="/login")登录
+                li
+                  a(href="/reg")注册
+              else
+                li(class="active")
+                  a(href="/u/"+user.name)首页
+                li
+                  a(href="/upload")上传
+                li
+                  a(href="/logout")登出
+    
+    div(class="navbar navbar-default")
+      .container
+        .navbar-header
+          a(class="navbar-brand" href="#")
+            span(class="label label-primary")公司简介
+        div(class="navbar-collapse collapse")
+          ul(class="nav navbar-nav")
+            li(class="active")
+              a(href="#")
+                span(class="label label-primary")关于我们                        
+            li
+              a(href="#")
+                span(class="label label-primary")联系方式
+            li
+              a(href="#")
+                span(class="label label-primary")产品介绍
+            li
+              a(href="/models")
+                span(class="label label-primary")成功案例
+            li
+              a(href="#")
+                span(class="label label-primary")合作伙伴
+    div(id="myCarousel", class="carousel slide").
+      <div class="carousel-inner">
+        <div class="item active">
+          <img src="upload/bg/4918780.jpg" alt="">
+          <div class="container">
+            <div class="carousel-caption">
+              <h1>Example headline.</h1>
+              <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+              <a class="btn btn-large btn-primary" href="#">Sign up today</a>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="upload/bg/2.jpg" alt="">
+          <div class="container">
+            <div class="carousel-caption">
+              <h1>Another example headline.</h1>
+              <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+              <a class="btn btn-large btn-primary" href="#">Learn more</a>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="upload/bg/3.jpg" alt="">
+          <div class="container">
+            <div class="carousel-caption">
+              <h1>One more for good measure.</h1>
+              <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+              <a class="btn btn-large btn-primary" href="#">Browse gallery</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a class="left carousel-control" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+      <a class="right carousel-control" href="#myCarousel" data-slide="next">&rsaquo;</a>
+    
+    #container.container
+      if success
+        div(class="alert alert-success")=success
+      if error
+        div(class="alert alert-error")=error
+      block content
+      hr
+      footer
+        p
+          a(href="http://www.google.com", target="_blank") Next Ltd Co. 2012
+  
+  script(src="/javascripts/jquery.js")
+  script(src="/javascripts/bootstrap.js")

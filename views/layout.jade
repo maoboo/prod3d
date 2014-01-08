@@ -1,0 +1,35 @@
+doctype 5
+html
+	head
+		title= title
+		link(rel="stylesheet" href="/lib/uploadlist.css")
+		script(type="text/javascript" src="/lib/jquery-1.9.1.js")
+
+  
+  
+	body
+		block content
+		script.
+			function del(name){
+				
+				var img=document.getElementById('delfile');
+				$.post("/delete",
+				{
+					file:img.value
+				});
+				
+				
+				var child=document.getElementsByName(name);
+				
+				
+				document.body.removeChild(child[0]);
+				
+				}
+			var go=document.querySelector("#uploadimg");
+			go.onchange =  function(event){
+				document.getElementById('upsubmit').submit();
+				
+				}
+			function   back(){
+				document.getElementById('backmod').submit();
+				} 

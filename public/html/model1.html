@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>三维商品展示</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<link rel=stylesheet href="/lib/main.css" />
+<script type="text/javascript" src="/lib/jquery-1.9.1.js"></script>
+<script src="/lib/three.min.js"></script> 
+<script src="/lib/Detector.js"></script> 
+<script src="/lib/OrbitControls.js"></script> 
+<script src="/lib/jquery-ui.js"></script>
+</head>
+<body>
+    <button id="123">显示/消失</button>
+    <div class="listArea" id="le" >
+      <div class="bt">背景</div>
+      <div class="bt">动画</div>
+      <div class="bt">说明</div>
+      <div class="sl">
+        <div class="bg">
+          <ul>
+            <li><img src="bg/1.jpg" /></li>
+            <li><img src="bg/2.jpg" /></li>
+            <li><img src="bg/3.jpg" /></li>
+            <li><img src="bg/3.jpg" /></li>
+            <li><img src="bg/3.jpg" /></li>
+          </ul>
+        </div>
+        <div class="ani" id="ani1"></div>
+        <div class="sho" id="sho1"></div>    
+        <div style="clear:both">
+      </div>
+      </div>
+    </div>
+    <script src="/lib/main.js"></script>
+    <script type="text/javascript">
+    	init();
+    	animate();
+    </script>
+</body>
+</html>

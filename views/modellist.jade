@@ -1,0 +1,15 @@
+link(rel="stylesheet" href="/lib/modelslist.css")
+
+.nv 云蓝三维商品展示示范
+
+each rec in models
+    .span4
+        a(href=rec.url,target="aa")
+            img(src=rec.img)
+        p=rec.desc
+      
+//h2 上传背景图片
+//form(method="get" action="/html/shot.html")
+//  button( type="submit") 用摄像头拍照1111
+//form(method="get" action="upload")
+//  button( type="submit") 上传本地照片

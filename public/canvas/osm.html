@@ -1,0 +1,345 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Canvas Slippy Map</title>
+		<script type="text/javascript" src="/lib/jquery-1.9.1.js"></script>
+		<script src="/lib/three.min.js"></script> 
+		<script src="/lib/Detector.js"></script> 
+		<script src="/lib/OrbitControls.js"></script> 
+		<script src="/lib/jquery-1.9.1.js"></script>
+		<link rel="icon" href="/favicon.ico"/>
+		
+		<!--[if IE]>
+			<script src="excanvas.js"></script>
+		<![endif]-->
+		
+		<style>
+			body
+			{
+				font-family: sans-serif;
+			}
+			h1
+			{
+				font-size: 1.2em;
+				font-weight: bold;
+			}
+			#map
+			{
+				border: solid 1px #2244ED;
+				cursor: move;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>A canvas slippy map</h1>
+		<p>This is a canvas slippy map based that draws <a href="http://www.openstreetmap.org/">OpenStreetMap</a> tiles. Drawing is performed using the
+		HTML5 canvas.</p>
+
+		<canvas id="map" width="200" height="200"
+			onmousedown="mouseDown(event);" onmousemove="mouseMove(event);"
+			onmouseup="mouseUp();" onmouseout="mouseOut();">
+			
+			Your  browser doesn't support canvas elements.
+			
+		</canvas>
+		
+		<script>
+			var canvas = document.getElementById("map");
+			var context = canvas.getContext("2d");
+			
+			if (window.addEventListener)
+				// DOMMouseScroll is for mozilla.
+				window.addEventListener('DOMMouseScroll', mouseWheel, false);
+			// IE/Opera maybe.
+			window.onmousewheel = mouseWheel;
+			// Should really just be able to do onmousewheel="mouseWheel(event);"
+
+			
+			var tileSize = 256;
+			var maxZ = 18; // The minimum is 0.
+			
+			render();
+			
+			var posX = 30100100.0; // Current position in the map in pixels at the maximum zoom level (18)
+			var posY = 30100100.0; // The range is 0-67108864 (2^maxZ * tileSize)
+			var posZ = 5.0; // This can be fractional if we are between zoom levels.
+			
+			var lastMouseX = 0;
+			var lastMouseY = 0;
+			
+			// Used as an assiciative array. They keys have to be strings, ours will be "xindex,yindex,zindex" e.g. "13,245,12".
+			var tiles = {};
+			
+			var dragging = false;
+
+			function mouseDown(event)
+			{
+				if (!event)
+					event = window.event;
+
+				var x = event.clientX - canvas.offsetLeft;
+				var y = event.clientY - canvas.offsetTop;
+				if (event.button === 0)
+				{
+					dragging = true;
+				}
+				lastMouseX = x;
+				lastMouseY = y;
+			}
+			
+			function mouseMove(event)
+			{
+				// TODO: Capture mouse move events outside the canvas...
+				if (!event)
+					var event = window.event;
+				var x = event.clientX - canvas.offsetLeft;
+				var y = event.clientY - canvas.offsetTop;
+				if (dragging === true)
+				{
+					var dX = x - lastMouseX;
+					var dY = y - lastMouseY;
+					posX -= dX * Math.pow(2, maxZ-posZ);
+					posY -= dY * Math.pow(2, maxZ-posZ);
+					render();
+				}
+				lastMouseX = x;
+				lastMouseY = y;
+			}
+			
+			function mouseUp()
+			{
+				dragging = false;
+			}
+			
+			function mouseOut()
+			{
+	//			dragging = false;
+			}
+			
+			function mouseWheel(event)
+			{
+				if (!event)
+					event = window.event;
+				var delta = 0;
+				if (event.wheelDelta)
+				{
+					delta = event.wheelDelta/120;
+					if (window.opera)
+						delta = -delta;
+				}
+				else if (event.detail)
+				{
+					delta = -event.detail/3;
+				}
+				
+				if (delta > 0)
+					zoomIn();
+				else if (delta < 0)
+					zoomOut();
+			}
+			
+			function zoomIn()
+			{
+				if (posZ < maxZ)
+				{
+					++posZ;
+					render();
+				}
+			}
+			
+			function zoomOut()
+			{
+				if (posZ > 0)
+				{
+					--posZ;
+					render();
+				}
+			}					
+			
+			function rand(n)
+			{
+				return Math.floor(Math.random()*n); // Could this actually return num? What if Math.random() returns 1.0000 (very unlikely but possible?)
+			}
+			
+			// A sane mod function that works for negative numbers.
+			// Returns a % b.
+			function mod(a, b)
+			{
+				return ((a % b) + b) % b;
+			}
+			
+			function normaliseIndices(x, y, z)
+			{
+				return [mod(x, Math.pow(2, z)), mod(y, Math.pow(2, z)), z];
+			}
+
+			function tileString(x, y, z)
+			{
+				n = normaliseIndices(x, y, z);
+				x = n[0]; y = n[1]; z = n[2];
+				var sub = ["a", "b", "c"];
+				var url = "http://" + sub[rand(3)] + ".tile.openstreetmap.org/" + z + "/" + x + "/" + y + ".png";
+				return url;
+			}
+			
+			// Returns true if the tile is outside the current view.
+			function isOutsideWindow(t)
+			{
+				var pos = decodeIndex(t);
+				var x = pos[0];
+				var y = pos[1];
+				var z = pos[2];
+				
+				var w = canvas.width * Math.pow(2, maxZ-z);
+				var h = canvas.height * Math.pow(2, maxZ-z);
+				
+				x *= Math.pow(2, maxZ-z);
+				y *= Math.pow(2, maxZ-z);
+				
+				var sz = tileSize * Math.pow(2, maxZ-z);
+				if (x > posX + w/2 || y > posY + h/2 || x + sz < posX - w/2 || y - sz < posY - h/2)
+					return true;
+				return false;
+			}
+			
+			function encodeIndex(x, y, z)
+			{
+				n = normaliseIndices(x, y, z);
+				x = n[0]; y = n[1]; z = n[2];
+				return x + "," + y + "," + z;
+			}
+			
+			function decodeIndex(t)
+			{
+				return t.split(",", 3);			
+			}
+			
+			function render()
+			{
+				// Go through all the currently loaded tiles. If we don't want any of them remove them.
+			//	for (t in tiles)
+			//	{
+		//			if (isOutsideWindow(t))
+		//				delete tiles[t];
+			//	}
+				var z = posZ; // TODO: Round.
+				var w = canvas.width * Math.pow(2, maxZ-z); // Width in level 18 pixels.
+				var h = canvas.height * Math.pow(2, maxZ-z); // Height in level 18 pixels.
+				var sz = tileSize * Math.pow(2, maxZ-z); // Tile size in level 18 pixels.
+				
+				var xMin = posX - w/2; // Corners of the window in level 18 pixels.
+				var yMin = posY - h/2;
+				var xMax = posX + w/2;
+				var yMax = posY + h/2;
+				
+				// Go through all the tiles we want. If any of them aren't loaded or being loaded, do so.
+				for (var x = Math.floor(xMin / sz); x < Math.ceil(xMax / sz); ++x)
+				{
+					for (var y = Math.floor(yMin / sz); y < Math.ceil(yMax / sz); ++y)
+					{
+						var xoff = (x * sz - xMin) / Math.pow(2, maxZ-z);
+						var yoff = (y * sz - yMin) / Math.pow(2, maxZ-z);
+						var tileKey = encodeIndex(x, y, z);
+						if (tiles[tileKey] && tiles[tileKey].complete)
+						{
+							// Round here is **CRUICIAL** otherwise the images are filtered and the performance sucks (more than I would expect but hey).
+							context.drawImage(tiles[tileKey], Math.round(xoff), Math.round(yoff));
+						}
+						else
+						{
+							if (!tiles[tileKey])
+							{
+								tiles[tileKey] = new Image();
+								tiles[tileKey].src = tileString(x, y, posZ);
+								tiles[tileKey].onload = function()
+								{
+									// TODO: Just render this tile where it should be.
+					//				context.drawImage(tiles[tileKey], Math.round(xoff), Math.round(yoff)); // Doesn't work for some reason.
+									render();
+								}
+							}
+							context.fillStyle = "#ffffff";
+							context.fillRect(Math.round(xoff), Math.round(yoff), tileSize, tileSize);
+						}
+					}
+				}
+			}
+			
+			window.onload = window.onresize = function()
+			{
+				var viewportWidth = window.innerWidth;
+				var viewportHeight = window.innerHeight;
+				
+				var canvasWidth = viewportWidth * 0.3;
+				var canvasHeight = (viewportHeight-110) * 0.3;
+				canvas.style.position = "fixed";
+				canvas.width = canvasWidth;
+				canvas.height = canvasHeight;
+				render();
+			}
+
+		</script>
+		
+		<!-- Google Analytics Tracking Code -->
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			try
+			{
+				var pageTracker = _gat._getTracker("UA-2724776-4");
+				pageTracker._trackPageview();
+			}
+			catch(err)
+			{
+			}
+		</script>
+		
+		
+		
+	    <script type="text/javascript">
+	 // set the scene size
+	    var WIDTH = 400,
+	      HEIGHT = 300;
+
+	    // set some camera attributes
+	    var VIEW_ANGLE = 45,
+	      ASPECT = WIDTH / HEIGHT,
+	      NEAR = 0.1,
+	      FAR = 10000;
+
+	    // get the DOM element to attach to
+	    // - assume we've got jQuery to hand
+	    var $container = $('#container');
+
+	    // create a WebGL renderer, camera
+	    // and a scene
+	    var renderer = new THREE.WebGLRenderer();
+	    var camera =
+	      new THREE.PerspectiveCamera(
+	        VIEW_ANGLE,
+	        ASPECT,
+	        NEAR,
+	        FAR);
+
+	    var scene = new THREE.Scene();
+
+	    // add the camera to the scene
+	    scene.add(camera);
+
+	    // the camera starts at 0,0,0
+	    // so pull it back
+	    camera.position.z = 300;
+
+	    // start the renderer
+	    renderer.setSize(WIDTH, HEIGHT);
+
+	    // attach the render-supplied DOM element
+	    $container.append(renderer.domElement);
+	    </script>
+	    <div id='container'></div>
+	</body>
+</html>

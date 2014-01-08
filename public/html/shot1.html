@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Capture Photo</title>
+<script src="http://www.html5rocks.com/static/js/modernizr.custom.82437.js"></script>
+<script src="/lib/jquery-1.9.1.js"></script>
+</head>
+<body>
+<div id="bg">
+  <div class="a">云蓝三维商品展示
+   <!--onClick="javascript :history.back(-1)"-->
+    <div id="back">保存返回</div>
+    <div id="shot">截屏</div>
+  </div>
+  <div class ="b" id="play">
+    <div style="text-align:center;width:100%;height:100%">
+      <video id="screenshot-stream" class="videostream" autoplay></video>
+    </div>
+  </div>
+  <div class="c" id="imglist"> 
+  <!--	<img id="screenshot" src="">-->
+    
+  </div>
+  <canvas id="screenshot-canvas" style="display:none;"></canvas>
+</div>
+<script>
+function errorCallback(e) {
+  if (e.code == 1) {
+    alert('User denied access to their camera');
+  } else {
+    alert('getUserMedia() not supported in your browser.');
+  }
+  //e.target.src = 'http://www.html5rocks.com/en/tutorials/video/basics/Chrome_ImF.ogv';
+}
+
+var imgs=document.getElementById("imglist");
+
+(function() {
+var video = document.querySelector('#screenshot-stream');
+var button = document.querySelector('#shot');
+var canvas = document.querySelector('#screenshot-canvas');
+//var imgs = document.querySelectorAll('#screenshot');
+//var imgs=document.getElementById("imglist");
+var ctx = canvas.getContext('2d');
+var localMediaStream = null;
+
+function sizeCanvas() {
+  // video.onloadedmetadata not firing in Chrome so we have to hack.
+  // See crbug.com/110938.
+  setTimeout(function() {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+  //  img.height = video.videoHeight;
+ //   img.width = video.videoWidth;
+  }, 100);
+}
+
+function snapshot() {
+  ctx.drawImage(video, 0, 0);
+  var im=document.createElement('img');
+  im.setAttribute("id","screenshot");
+  im.src = canvas.toDataURL('image/webp');
+ 
+  imgs.appendChild(im);
+}
+
+button.addEventListener('click', function(e) {
+
+  if (localMediaStream) {
+    snapshot();
+    return;
+  }
+});
+$(function () {
+  if (navigator.getUserMedia) {
+    navigator.getUserMedia('video', function(stream) {
+      video.src = stream;
+      localMediaStream = stream;
+      sizeCanvas();
+  	  
+    }, errorCallback);
+  } else if (navigator.webkitGetUserMedia) {
+    navigator.webkitGetUserMedia({video: true}, function(stream) {
+      video.src = window.URL.createObjectURL(stream);
+      localMediaStream = stream;
+      sizeCanvas();
+      //navigator.clear();
+    }, errorCallback);
+  } else {
+    errorCallback({target: video});
+  }
+}, false);
+
+video.addEventListener('click', snapshot, false);
+
+document.querySelector('#back').addEventListener('click', function(e) {
+  //video.pause();
+  //localMediaStream.stop(); // Doesn't do anything in Chrome.
+  var img=imgs.getElementsByTagName('img')[0];
+  //alert(img.src);
+ // for(var i=0; i< img.length;i++){
+  $.post('/uploadDir', { img: img.src});
+windows.history.back();
+ // }
+ 
+}, false);
+})();
+
+document.getElementById("bg").style.width=window.innerWidth+"px";
+document.getElementById("bg").style.height=window.innerHeight+"px";
+document.getElementById("play").style.height=window.innerHeight-240+"px";
+window.addEventListener('resize', onWindowResize, false);
+function onWindowResize(){
+document.getElementById("bg").style.width=window.innerWidth+"px";
+document.getElementById("bg").style.height=window.innerHeight+"px";
+document.getElementById("play").style.height=window.innerHeight-240+"px";
+
+}
+</script>
+<style>
+* {
+	margin: 0;
+	padding: 0;
+	box-shadow: 1px 1px 5px #036;
+}
+.videostream, #cssfilters-stream {
+  width: auto;
+  height: 100%;
+}
+.videostream, #cssfilters-stream {
+  background: rgba(255,255,255,0.5);
+  border: 1px solid #ccc;
+}
+#screenshot {
+	float:left;
+  	width:auto;
+	height:95%;
+	margin-top:5px;
+	margin-left:5px;
+}
+
+
+.blur {
+  -webkit-filter: blur(3px);
+  -moz-filter: blur(3px);
+  -o-filter: blur(3px);
+  -ms-filter: blur(3px);
+  filter: blur(3px);
+}
+.brightness {
+  -webkit-filter: brightness(5);
+  -moz-filter: brightness(5);
+  -o-filter: brightness(5);
+  -ms-filter: brightness(5);
+  filter: brightness(5);
+}
+.contrast {
+  -webkit-filter: contrast(8);
+  -moz-filter: contrast(8);
+  -o-filter: contrast(8);
+  -ms-filter: contrast(8);
+  filter: contrast(8);
+}
+.hue-rotate {
+  -webkit-filter: hue-rotate(90deg);
+  -moz-filter: hue-rotate(90deg);
+  -o-filter: hue-rotate(90deg);
+  -ms-filter: hue-rotate(90deg);
+  filter: hue-rotate(90deg);
+}
+.hue-rotate2 {
+  -webkit-filter: hue-rotate(180deg);
+  -moz-filter: hue-rotate(180deg);
+  -o-filter: hue-rotate(180deg);
+  -ms-filter: hue-rotate(180deg);
+  filter: hue-rotate(180deg);
+}
+.hue-rotate3 {
+  -webkit-filter: hue-rotate(270deg);
+  -moz-filter: hue-rotate(270deg);
+  -o-filter: hue-rotate(270deg);
+  -ms-filter: hue-rotate(270deg);
+  filter: hue-rotate(270deg);
+}
+.saturate {
+  -webkit-filter: saturate(10);
+  -moz-filter: saturate(10);
+  -o-filter: saturate(10);
+  -ms-filter: saturate(10);
+  filter: saturate(10);
+}
+.grayscale {
+  -webkit-filter: grayscale(1);
+  -moz-filter: grayscale(1);
+  -o-filter: grayscale(1);
+  -ms-filter: grayscale(1);
+  filter: grayscale(1);
+}
+.sepia {
+  -webkit-filter: sepia(1);
+  -moz-filter: sepia(1);
+  -o-filter: sepia(1);
+  -ms-filter: sepia(1);
+  filter: sepia(1);
+}
+.invert {
+  -webkit-filter: invert(1);
+  -moz-filter: invert(1)
+  -o-filter: invert(1)
+  -ms-filter: invert(1)
+  filter: invert(1)
+}
+
+.a{
+	width:100%;
+	height:40px;
+	background-color:#09F;
+	color: #FFF;
+	text-align: center;
+	font-size:36px;
+	line-height: 30px;
+	font-weight: bold;
+	
+	}
+.b{
+	width:100%;
+	
+	background-color:#999;
+	
+	}
+.c{
+	width:100%;
+	height:200px;
+	background-color:#09F;
+	overflow-x: scroll;
+	
+	}
+	
+#back{
+	float:left;
+	width:100px;
+	height:30px;
+	background-color:#CCC;
+	color: #06F;
+	font-size:14px;
+text-align: center;
+line-height: 30px;
+font-weight: bold;
+margin-left:5px;
+margin-top:5px;
+	}
+#shot{
+	float:right;
+	width:100px;
+	height:30px;
+	background-color:#CCC;
+	color: #06F;
+	font-size:14px;
+text-align: center;
+line-height: 30px;
+font-weight: bold;
+margin-right:5px;
+margin-top:5px;
+	
+	}
+</style>
+</body>
+</html>

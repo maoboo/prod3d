@@ -1,0 +1,57 @@
+!!! 5
+html(lang="en")
+    head
+        title 三维商品展示
+        meta(charset="utf-8")
+        meta(name="viewport", content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=2.0")
+        link(rel="stylesheet" href="/lib/main.css")
+        link(rel="stylesheet" href="/lib/modelslist.css")
+        script(type="text/javascript" src="/lib/jquery-1.9.1.js")
+        //script(src="/lib/three.min.js")
+        script(src="/lib/three_63.js")
+        script(src="/lib/Detector.js")
+        script(src="/lib/OrbitControls.js")
+        script(src="/lib/TransformControls.js")
+
+    body
+        .dv	商品展示
+            #showmenu	隐藏菜单
+            #backlist   返回列表
+        .listArea(id="le")
+            |<div class="bt">背   景</div>
+            |<div class="bg" id="bg1">
+            |  <div style="height:35px">
+            |    <div id="add">+</div>
+            |    <div id="sub">-</div>
+            |  </div><div id="bgcon">
+            |    <div id="bgimgs">
+            each images in imagefiles
+                li
+                    .bgt
+                        img(src=images)
+                        .del
+            |  </div></div>
+            |</div>
+            |<div class="bt">动   画</div>
+            |<div class="ani" id="ani1"></div>
+            |<div class="bt">说   明</div>
+            |<div class="sho" id="sho1"></div>
+            |<div class="bt">推  荐</div>
+            |<div class="tui" id="tui1">
+            each rec in models
+                .span4
+                    //img(src=rec.img,onclick="loadmodel("+"'"+rec.objname+"');")
+                    img(src=rec.img,onclick="loadmodel("+"'"+rec.url+"/"+rec.objname+"');")
+                    p=rec.desc
+            |</div>
+            |<div style="clear:both">
+            |</div>
+        div(id="fullbg")
+        div(id="dialog")
+            |<div id="opencamera"><a href="/html/shot.html">打开相机</a></div>
+            |<div id="openfile"><form id="uploadimg" method="post" action="/upload" enctype="multipart/form-data"><input name="upimg" type="file" id="take-picture"   accept="image/*"></form>打开文件</div>
+            |<div id="closedialog">关闭</div>
+            |</div>
+        #backimgs(file=imagefiles)
+        script(src="/lib/main.js")
+        

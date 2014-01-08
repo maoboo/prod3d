@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+        <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+        <meta name="apple-mobile-web-app-capable" content="yes" /> 
+<title>At Your Party</title>
+<style>
+        html *{
+                margin: 0px;
+                padding: 0px;
+        }
+        .mainBody{
+                background-image: url(images/bg.png);
+        }
+        .mainPage{
+                width: 100%;
+        }
+        .pageTitle{
+                height: 56px;
+                background-image: url(images/title.png);
+                background-repeat: repeat-x;
+                text-align: center;
+        }
+        #titleText{
+                font-family: "Helvetica","Verdana";
+                color: #FFF;
+                font-weight: bold;
+                font-size: 1.2em;
+                line-height: 2.5em;
+                text-shadow: #666666 2px 2px 1px;
+
+        }
+</style>
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=ABQIAAAAPDUET0Qt7p2VcSk6JNU1sBSM5jMcmVqUpI7aqV44cW1cEECiThQYkcZUPRJn9vy_TWxWvuLoOfSFBw" type="text/javascript"></script>
+<script type="text/javascript">
+        function showMap(position) {
+                map = new GMap2(document.getElementById("mapCanvas"));
+                var lat = position.coords.latitude;
+                var lon = position.coords.longitude;
+                
+               
+                var myPoint = new GLatLng(lat, lon);
+                map.setCenter(myPoint, 15);
+                
+                var yourCurrPoint = new GMarker(myPoint);
+                map.addOverlay(yourCurrPoint);
+        }
+</script>
+</head>
+<body class="mainBody" onload="navigator.geolocation.getCurrentPosition(showMap)" onunload="GUnload()">
+        <div class="mainPage">
+                <div class="pageTitle">
+                        <span id="titleText">Title here...</span>
+                </div>
+                <div class="pageContent">
+                        <div id="mapCanvas" style="width: 500px; height: 300px">
+			
+			</div>
+                </div>
+        </div>
+</body>
+</html>
